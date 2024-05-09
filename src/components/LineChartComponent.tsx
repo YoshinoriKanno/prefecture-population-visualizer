@@ -12,26 +12,23 @@ HighchartsAccessibility(Highcharts);
 const LineChartComponent = () => {
   const options = {
     title: {
-      text: 'My chart'
+      text: 'My chart',
     },
     series: [
       {
-        data: [1, 2, 3, 4, 5, 6]
-      }
+        data: [1, 2, 3, 4, 5, 6],
+      },
     ],
     accessibility: {
-      enabled: false
-    }
+      enabled: false,
+    },
   };
 
   return (
     <div>
-      <HighchartsReact
-        highcharts={Highcharts}
-        options={options}
-      />
+      <HighchartsReact highcharts={Highcharts} options={options} />
     </div>
   );
-}
+};
 
 export default LineChartComponent;
