@@ -1,53 +1,82 @@
-// src/components/LineChartComponent.jsx
-import React from 'react';
-
+// src/components/LineChartComponent.tsx
+import React, { useEffect, useState } from 'react';
 import Highcharts from 'highcharts';
-import HighchartsAccessibility from 'highcharts/modules/accessibility';
-
 import HighchartsReact from 'highcharts-react-official';
 
-// モジュールの初期化
-HighchartsAccessibility(Highcharts);
+interface PopulationDataEntry {
+  year: number;
+  value: number;
+}
+
+interface PopulationResponse {
+  message: string | null;
+  result: {
+    boundaryYear: number;
+    data: {
+      label: string;
+      data: PopulationDataEntry[];
+    }[];
+  };
+}
 
 const LineChartComponent = () => {
+  const [chartData, setChartData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const url =
+        'https://opendata.resas-portal.go.jp/api/v1/population/composition/perYear?cityCode=11362&prefCode=11';
+
+      // 環境変数から API キーを取得し、未定義の場合はエラーを投げる
+      const apiKey = process.env.REACT_APP_API_KEY;
+      if (!apiKey) {
+        throw new Error('API key is undefined. Please check your .env file.');
+      }
+      const options = {
+        method: 'GET',
+        headers: {
+          'X-API-KEY': apiKey, // apiKeyがundefinedでないことが保証される
+        },
+      };
+
+      try {
+        const response = await fetch(url, options);
+        const json = await response.json();
+        const populationData = json.result.data[0].data.map(
+          (item: PopulationDataEntry) => ({
+            x: item.year,
+            y: item.value,
+          })
+        );
+        setChartData(populationData);
+      } catch (error) {
+        console.error('Error fetching data: ', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const options = {
     title: {
-      text: 'My chart',
+      text: '総人口推移',
     },
-    plotOptions: {
-      series: {
-        label: {
-          connectorAllowed: false,
-        },
-        pointStart: 2010,
+    xAxis: {
+      title: {
+        text: '年',
+      },
+    },
+    yAxis: {
+      title: {
+        text: '人口数',
       },
     },
     series: [
       {
-        name: 'Installation & Developers',
-        data: [
-          43934, 48656, 65165, 81827, 112143, 142383, 171533, 165174, 155157,
-          161454, 154610,
-        ],
-      },
-      {
-        name: 'Manufacturing',
-        data: [
-          24916, 37941, 29742, 29851, 32490, 30282, 38121, 36885, 33726, 34243,
-          31050,
-        ],
-      },
-      {
-        name: 'Sales & Distribution',
-        data: [
-          11744, 30000, 16005, 19771, 20185, 24377, 32147, 30912, 29243, 29213,
-          25663,
-        ],
+        name: '総人口',
+        data: chartData,
       },
     ],
-    accessibility: {
-      enabled: false,
-    },
   };
 
   return (
