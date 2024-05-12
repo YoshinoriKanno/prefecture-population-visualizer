@@ -8,21 +8,46 @@ interface PopulationDataEntry {
   value: number;
 }
 
+interface Prefecture {
+  prefCode: number;
+  prefName: string;
+}
+
 const LineChartComponent = () => {
-  const [chartData11, setChartData11] = useState<PopulationDataEntry[]>([]);
-  const [chartData12, setChartData12] = useState<PopulationDataEntry[]>([]);
+  const [prefectures, setPrefectures] = useState<Prefecture[]>([]);
+  const [selectedPrefectures, setSelectedPrefectures] = useState<number[]>([]);
+  const [chartData, setChartData] = useState<{
+    [key: number]: PopulationDataEntry[];
+  }>({});
   const [currentLabel, setCurrentLabel] = useState<string>('総人口');
-  const [showPref11, setShowPref11] = useState(true);
-  const [showPref12, setShowPref12] = useState(true);
 
   const labels = ['総人口', '年少人口', '生産年齢人口', '老年人口'];
 
-  // PrefCodeに基づいてデータを取得し、指定したラベルのデータをセットする
-  const fetchData = async (
-    prefCode: string,
-    setData: React.Dispatch<React.SetStateAction<PopulationDataEntry[]>>,
-    label: string
-  ) => {
+  // 全国の都道府県データを取得
+  const fetchPrefectures = async () => {
+    const url = 'https://opendata.resas-portal.go.jp/api/v1/prefectures';
+    const apiKey = process.env.REACT_APP_API_KEY;
+    if (!apiKey) {
+      throw new Error('API key is undefined. Please check your .env file.');
+    }
+    const options = {
+      method: 'GET',
+      headers: {
+        'X-API-KEY': apiKey,
+      },
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const json = await response.json();
+      setPrefectures(json.result);
+    } catch (error) {
+      console.error('Error fetching prefectures: ', error);
+    }
+  };
+
+  // PrefCodeに基づいてデータを取得し、指定したラベルのデータをセット
+  const fetchData = async (prefCode: number, label: string) => {
     const url = `https://opendata.resas-portal.go.jp/api/v1/population/composition/perYear?cityCode=-&prefCode=${prefCode}`;
     const apiKey = process.env.REACT_APP_API_KEY;
     if (!apiKey) {
@@ -39,7 +64,6 @@ const LineChartComponent = () => {
       const response = await fetch(url, options);
       const json = await response.json();
 
-      // 指定されたラベルに対応するデータを抽出
       const selectedData = json.result.data.find(
         (item: any) => item.label === label
       );
@@ -50,22 +74,39 @@ const LineChartComponent = () => {
         })
       );
 
-      setData(populationData);
+      setChartData((prevData) => ({
+        ...prevData,
+        [prefCode]: populationData,
+      }));
     } catch (error) {
       console.error('Error fetching data: ', error);
     }
   };
 
-  // データを取得しなおす処理
+  // 選択された都道府県のデータを更新
   const updateData = () => {
-    fetchData('11', setChartData11, currentLabel);
-    fetchData('12', setChartData12, currentLabel);
+    selectedPrefectures.forEach((prefCode) => {
+      fetchData(prefCode, currentLabel);
+    });
   };
 
-  // 初回読み込み時、またはラベルの変更時にデータを更新
+  // 初回実行時および選択ラベル変更時にデータを更新
   useEffect(() => {
     updateData();
-  }, [currentLabel]);
+  }, [currentLabel, selectedPrefectures]);
+
+  // 初回実行時に都道府県リストを取得
+  useEffect(() => {
+    fetchPrefectures();
+  }, []);
+
+  const togglePrefectureSelection = (prefCode: number) => {
+    setSelectedPrefectures((prev) =>
+      prev.includes(prefCode)
+        ? prev.filter((code) => code !== prefCode)
+        : [...prev, prefCode]
+    );
+  };
 
   const options = {
     title: {
@@ -81,44 +122,30 @@ const LineChartComponent = () => {
         text: '人口数',
       },
     },
-    series: [
-      {
-        name: '埼玉県',
-        data: chartData11.map((item) => ({
-          x: item.year,
-          y: item.value,
-        })),
-        visible: showPref11,
-      },
-      {
-        name: '千葉県',
-        data: chartData12.map((item) => ({
-          x: item.year,
-          y: item.value,
-        })),
-        visible: showPref12,
-      },
-    ],
+    series: selectedPrefectures.map((prefCode) => ({
+      name:
+        prefectures.find((pref) => pref.prefCode === prefCode)?.prefName ||
+        `PrefCode ${prefCode}`,
+      data:
+        chartData[prefCode]?.map((item) => ({ x: item.year, y: item.value })) ||
+        [],
+    })),
   };
 
   return (
     <div style={{ width: '100%' }}>
-      <label>
-        <input
-          type="checkbox"
-          checked={showPref11}
-          onChange={(e) => setShowPref11(e.target.checked)}
-        />
-        埼玉県
-      </label>
-      <label>
-        <input
-          type="checkbox"
-          checked={showPref12}
-          onChange={(e) => setShowPref12(e.target.checked)}
-        />
-        千葉県
-      </label>
+      <div>
+        {prefectures.map((prefecture) => (
+          <label key={prefecture.prefCode}>
+            <input
+              type="checkbox"
+              checked={selectedPrefectures.includes(prefecture.prefCode)}
+              onChange={() => togglePrefectureSelection(prefecture.prefCode)}
+            />
+            {prefecture.prefName}
+          </label>
+        ))}
+      </div>
       <select
         value={currentLabel}
         onChange={(e) => setCurrentLabel(e.target.value)}
