@@ -89,7 +89,7 @@ const LineChartComponent = () => {
   };
 
   return (
-    <div>
+    <div style={{ width: '100%' }}>
       <label>
         <input
           type="checkbox"
