@@ -58,5 +58,9 @@
     "gh-pages": "^6.1.1",
     "prettier": "^3.2.5"
   },
-  "homepage": "https://YoshinoriKanno.github.io/prefecture-population-visualizer"
+  "homepage": "https://YoshinoriKanno.github.io/prefecture-population-visualizer",
+  "volta": {
+    "node": "20.13.1",
+    "npm": "10.7.0"
+  }
 }
