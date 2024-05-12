@@ -1,5 +1,5 @@
 // src/components/LineChartComponent.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 
@@ -13,6 +13,8 @@ interface Prefecture {
   prefName: string;
 }
 
+const API_KEY = process.env.REACT_APP_API_KEY;
+
 const LineChartComponent = () => {
   const [prefectures, setPrefectures] = useState<Prefecture[]>([]);
   const [selectedPrefectures, setSelectedPrefectures] = useState<number[]>([]);
@@ -23,82 +25,61 @@ const LineChartComponent = () => {
 
   const labels = ['総人口', '年少人口', '生産年齢人口', '老年人口'];
 
-  // 全国の都道府県データを取得
-  const fetchPrefectures = async () => {
+  const apiHeaders = {
+    'X-API-KEY': API_KEY ?? '',
+  };
+
+  const fetchPrefectures = useCallback(async () => {
     const url = 'https://opendata.resas-portal.go.jp/api/v1/prefectures';
-    const apiKey = process.env.REACT_APP_API_KEY;
-    if (!apiKey) {
-      throw new Error('API key is undefined. Please check your .env file.');
-    }
-    const options = {
-      method: 'GET',
-      headers: {
-        'X-API-KEY': apiKey,
-      },
-    };
 
     try {
-      const response = await fetch(url, options);
+      const response = await fetch(url, { headers: apiHeaders });
       const json = await response.json();
-      setPrefectures(json.result);
+      setPrefectures(json.result || []);
     } catch (error) {
       console.error('Error fetching prefectures: ', error);
     }
-  };
+  }, []);
 
-  // PrefCodeに基づいてデータを取得し、指定したラベルのデータをセット
-  const fetchData = async (prefCode: number, label: string) => {
+  const fetchPopulationData = async (prefCode: number, label: string) => {
     const url = `https://opendata.resas-portal.go.jp/api/v1/population/composition/perYear?cityCode=-&prefCode=${prefCode}`;
-    const apiKey = process.env.REACT_APP_API_KEY;
-    if (!apiKey) {
-      throw new Error('API key is undefined. Please check your .env file.');
-    }
-    const options = {
-      method: 'GET',
-      headers: {
-        'X-API-KEY': apiKey,
-      },
-    };
 
     try {
-      const response = await fetch(url, options);
+      const response = await fetch(url, { headers: apiHeaders });
       const json = await response.json();
-
       const selectedData = json.result.data.find(
         (item: any) => item.label === label
       );
-      const populationData: PopulationDataEntry[] = selectedData.data.map(
-        (item: any) => ({
+
+      if (selectedData) {
+        const populationData = selectedData.data.map((item: any) => ({
           year: item.year,
           value: item.value,
-        })
-      );
+        }));
 
-      setChartData((prevData) => ({
-        ...prevData,
-        [prefCode]: populationData,
-      }));
+        setChartData((prevData) => ({
+          ...prevData,
+          [prefCode]: populationData,
+        }));
+      }
     } catch (error) {
-      console.error('Error fetching data: ', error);
+      console.error(`Error fetching data for prefCode ${prefCode}: `, error);
     }
   };
 
-  // 選択された都道府県のデータを更新
-  const updateData = () => {
-    selectedPrefectures.forEach((prefCode) => {
-      fetchData(prefCode, currentLabel);
-    });
-  };
+  const updateSelectedPrefectureData = useCallback(() => {
+    selectedPrefectures.forEach((prefCode) =>
+      fetchPopulationData(prefCode, currentLabel)
+    );
+  }, [selectedPrefectures, currentLabel]);
 
-  // 初回実行時および選択ラベル変更時にデータを更新
-  useEffect(() => {
-    updateData();
-  }, [currentLabel, selectedPrefectures]);
-
-  // 初回実行時に都道府県リストを取得
   useEffect(() => {
     fetchPrefectures();
-  }, []);
+  }, [fetchPrefectures]);
+
+  useEffect(() => {
+    updateSelectedPrefectureData();
+  }, [updateSelectedPrefectureData]);
 
   const togglePrefectureSelection = (prefCode: number) => {
     setSelectedPrefectures((prev) =>
@@ -113,14 +94,10 @@ const LineChartComponent = () => {
       text: `${currentLabel}推移`,
     },
     xAxis: {
-      title: {
-        text: '年',
-      },
+      title: { text: '年' },
     },
     yAxis: {
-      title: {
-        text: '人口数',
-      },
+      title: { text: '人口数' },
     },
     series: selectedPrefectures.map((prefCode) => ({
       name:
