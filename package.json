@@ -24,7 +24,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "prettier": "prettier --write ."
+    "prettier": "prettier --write .",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -53,6 +55,8 @@
   "devDependencies": {
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
+    "gh-pages": "^6.1.1",
     "prettier": "^3.2.5"
-  }
+  },
+  "homepage": "https://YoshinoriKanno.github.io/prefecture-population-visualizer"
 }
