@@ -130,25 +130,28 @@ const LineChartComponent = () => {
 
   // UI部分
   return (
-    <div style={{ width: '100%' }}>
+    <div className={'p-graph'}>
       {/* 都道府県のチェックボックスリスト */}
-      <div>
+      <ul className={'p-graph__prefecture-lists'}>
         {prefectures.map((prefecture) => (
-          <label key={prefecture.prefCode}>
-            <input
-              type="checkbox"
-              checked={selectedPrefectures.includes(prefecture.prefCode)}
-              onChange={() => togglePrefectureSelection(prefecture.prefCode)}
-            />
-            {prefecture.prefName}
-          </label>
+          <li className={'p-graph__prefecture-list'}>
+            <label key={prefecture.prefCode}>
+              <input
+                type="checkbox"
+                checked={selectedPrefectures.includes(prefecture.prefCode)}
+                onChange={() => togglePrefectureSelection(prefecture.prefCode)}
+              />
+              {prefecture.prefName}
+            </label>
+          </li>
         ))}
-      </div>
+      </ul>
 
       {/* 人口カテゴリのセレクトボックス */}
       <select
         value={currentLabel}
         onChange={(e) => setCurrentLabel(e.target.value)}
+        className="c-select"
       >
         {labels.map((label) => (
           <option key={label} value={label}>

@@ -1,20 +1,15 @@
 .App {
   text-align: center;
-}
+  padding: 32px 16px;
+  background-color: #282a36;
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+  /* 768px 以上 */
+  @media (min-width: 768px) {
+    padding: 32px;
   }
 }
 
-.App-header {
-  background-color: #282c34;
+.App-main {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -22,17 +17,111 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+  max-width: 1024px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.App-link {
-  color: #61dafb;
-}
+.c-heading {
+  font-size: 1.6rem;
+  line-height: 1.25;
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+  /* 768px 以上 */
+  @media (min-width: 768px) {
+    font-size: 3rem;
   }
-  to {
-    transform: rotate(360deg);
+}
+
+.c-description {
+  font-size: 1rem;
+}
+
+/* Select のスタイル ================================ */
+
+/* ベーススタイル */
+.c-select {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  display: inline-block;
+  width: 100%;
+  max-width: 12rem;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 0.5rem;
+  border: 2px solid #6272a4;
+
+  background-color: #f8f8f2;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'><path fill='gray' d='M7 10l5 5 5-5z'/></svg>");
+  background-position: right 10px center;
+  background-repeat: no-repeat;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* ホバー時のスタイル */
+.c-select:hover {
+  border-color: #44475a;
+}
+
+/* 選択メニューのコンテナスタイル */
+.c-select-container {
+  margin: 10px 0;
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* select のスタイル */
+select.c-select {
+  appearance: none;
+  padding: 10px;
+  border: 2px solid #44475a;
+  border-radius: 0.5rem;
+  background-color: #f8f8f2;
+  cursor: pointer;
+  outline: none;
+  transition: border 0.3s;
+}
+
+select.c-select:hover,
+select.c-select:focus {
+  border-color: #6272a4;
+}
+
+option {
+  background-color: #f8f8f2;
+  color: #333;
+}
+
+/* グラフのスタイル ================================ */
+
+.p-graph {
+  width: 100%;
+}
+
+.p-graph__prefecture-lists {
+  list-style: none;
+  font-size: 1rem;
+  display: grid;
+  /* 3列のグリッド */
+  grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
+  text-align: left;
+  line-height: 2;
+  padding-left: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.p-graph__prefecture-list {
+  display: inline-block;
+}
+
+/* utility ================================ */
+
+/* 768px 以上 */
+@media (min-width: 768px) {
+  .md\:u-hidden {
+    display: none;
   }
 }

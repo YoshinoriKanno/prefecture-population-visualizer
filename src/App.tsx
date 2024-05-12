@@ -1,27 +1,19 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import LineChartComponent from './components/LineChartComponent';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
+      <main className="App-main">
+        <h1 className="c-heading">都道府県単位人口増減率</h1>
+        <p className="c-description">
+          1965-2045年（5年毎）の
+          <br className={'md:u-hidden'} />
+          都道府県単位人口増減率野グラフです。
         </p>
         <LineChartComponent />
-
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      </main>
     </div>
   );
 }
