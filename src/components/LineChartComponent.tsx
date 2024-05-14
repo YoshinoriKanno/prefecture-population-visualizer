@@ -3,6 +3,12 @@ import React, { useEffect, useState, useCallback } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 
+Highcharts.setOptions({
+  accessibility: {
+    enabled: false,
+  },
+});
+
 // 各データの型定義
 interface PopulationDataEntry {
   year: number;
@@ -134,7 +140,7 @@ const LineChartComponent = () => {
       {/* 都道府県のチェックボックスリスト */}
       <ul className={'p-graph__prefecture-lists'}>
         {prefectures.map((prefecture) => (
-          <li className={'p-graph__prefecture-list'}>
+          <li key={prefecture.prefCode} className={'p-graph__prefecture-list'}>
             <label key={prefecture.prefCode}>
               <input
                 type="checkbox"

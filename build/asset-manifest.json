@@ -8,8 +8,5 @@
     "main.d1f38c0a.js.map": "/prefecture-population-visualizer/static/js/main.d1f38c0a.js.map",
     "453.235dcea0.chunk.js.map": "/prefecture-population-visualizer/static/js/453.235dcea0.chunk.js.map"
   },
-  "entrypoints": [
-    "static/css/main.40f2cff0.css",
-    "static/js/main.d1f38c0a.js"
-  ]
+  "entrypoints": ["static/css/main.40f2cff0.css", "static/js/main.d1f38c0a.js"]
 }
