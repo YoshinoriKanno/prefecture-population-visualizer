@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/prefecture-population-visualizer/static/css/main.40f2cff0.css",
-    "main.js": "/prefecture-population-visualizer/static/js/main.0707ac4a.js",
+    "main.js": "/prefecture-population-visualizer/static/js/main.6c8625a2.js",
     "static/js/453.235dcea0.chunk.js": "/prefecture-population-visualizer/static/js/453.235dcea0.chunk.js",
     "index.html": "/prefecture-population-visualizer/index.html",
     "main.40f2cff0.css.map": "/prefecture-population-visualizer/static/css/main.40f2cff0.css.map",
-    "main.0707ac4a.js.map": "/prefecture-population-visualizer/static/js/main.0707ac4a.js.map",
+    "main.6c8625a2.js.map": "/prefecture-population-visualizer/static/js/main.6c8625a2.js.map",
     "453.235dcea0.chunk.js.map": "/prefecture-population-visualizer/static/js/453.235dcea0.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.40f2cff0.css",
-    "static/js/main.0707ac4a.js"
+    "static/js/main.6c8625a2.js"
   ]
 }
