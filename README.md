@@ -59,8 +59,6 @@ npm start
 npm run prettier
 ```
 
-build 時に ESLint が捜査します。
-
 ## ESLint
 
 build 時に ESLint が捜査します。
