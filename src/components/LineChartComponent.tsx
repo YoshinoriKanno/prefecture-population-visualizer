@@ -1,7 +1,9 @@
-// src/components/LineChartComponent.tsx
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
+import PrefectureList from './PrefectureList';
+import CategorySelector from './CategorySelector';
+import ErrorMessage from './ErrorMessage';
 
 Highcharts.setOptions({
   accessibility: {
@@ -62,7 +64,8 @@ const LineChartComponent = () => {
 
       // レスポンスから都道府県データを取得し、ステートに設定
       setPrefectures(json.result || []);
-      setErrorMessage(null); // エラーメッセージをクリア
+      // エラーメッセージをクリア
+      setErrorMessage(null);
     } catch (error: any) {
       console.error('Error fetching prefectures: ', error);
       setErrorMessage(error.message || 'データの取得に失敗しました。');
@@ -100,7 +103,8 @@ const LineChartComponent = () => {
             [prefCode]: populationData,
           }));
         }
-        setErrorMessage(null); // エラーメッセージをクリア
+        // エラーメッセージをクリア
+        setErrorMessage(null);
       } catch (error: any) {
         console.error(`Error fetching data for prefCode ${prefCode}: `, error);
         setErrorMessage(error.message || 'データの取得に失敗しました。');
@@ -159,39 +163,17 @@ const LineChartComponent = () => {
   // UI部分
   return (
     <div className={'p-graph'}>
-      {/* エラーメッセージの表示 */}
-      {errorMessage && <p className="c-error-message">{errorMessage}</p>}
-
-      {/* 都道府県のチェックボックスリスト */}
-      <ul className={'p-graph__prefecture-lists'}>
-        {prefectures.map((prefecture) => (
-          <li key={prefecture.prefCode} className={'p-graph__prefecture-list'}>
-            <label key={prefecture.prefCode}>
-              <input
-                type="checkbox"
-                checked={selectedPrefectures.includes(prefecture.prefCode)}
-                onChange={() => togglePrefectureSelection(prefecture.prefCode)}
-              />
-              {prefecture.prefName}
-            </label>
-          </li>
-        ))}
-      </ul>
-
-      {/* 人口カテゴリのセレクトボックス */}
-      <select
-        value={currentLabel}
-        onChange={(e) => setCurrentLabel(e.target.value)}
-        className="c-select"
-      >
-        {labels.map((label) => (
-          <option key={label} value={label}>
-            {label}
-          </option>
-        ))}
-      </select>
-
-      {/* Highchartsのチャートコンポーネント */}
+      <ErrorMessage message={errorMessage} />
+      <PrefectureList
+        prefectures={prefectures}
+        selectedPrefectures={selectedPrefectures}
+        togglePrefectureSelection={togglePrefectureSelection}
+      />
+      <CategorySelector
+        labels={labels}
+        currentLabel={currentLabel}
+        setCurrentLabel={setCurrentLabel}
+      />
       <HighchartsReact highcharts={Highcharts} options={options} />
     </div>
   );
