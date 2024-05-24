@@ -1,5 +1,7 @@
 # 都道府県別人口推移ビジュアライザー
 
+![Screen Shot](https://github.com/YoshinoriKanno/prefecture-population-visualizer/raw/main/screenshot.png)
+
 このアプリは、日本の各都道府県の人口推移データをビジュアル化するためのツールです。オープンデータを活用して、各都道府県の総人口、年少人口、生産年齢人口、老年人口をチェックボックスで選択し、簡単に折れ線グラフで比較することができます。
 
 ## 特徴
@@ -51,6 +53,18 @@ npm install
 npm start
 ```
 
+## Prettier
+
+```
+npm run prettier
+```
+
+build 時に ESLint が捜査します。
+
+## ESLint
+
+build 時に ESLint が捜査します。
+
 ## デプロイ
 
 このアプリはGitHub Pagesにデプロイできます。
@@ -60,3 +74,15 @@ npm start
 ```
 npm run deploy
 ```
+
+## Github Pages
+
+アプリの URL です。
+
+https://yoshinorikanno.github.io/prefecture-population-visualizer/
+
+## 都道府県のリストが表示されない場合
+
+都道府県のリストが表示されない場合、指定されたAPIキーが無効であるか、廃止されたバージョンや開発中のバージョンを参照している可能性があります。
+
+もしこの問題が発生した場合は、[Issues](https://github.com/YoshinoriKanno/prefecture-population-visualizer/issues)にてお知らせください。
