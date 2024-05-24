@@ -1,5 +1,5 @@
 // src/components/LineChartComponent.tsx
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 
@@ -38,10 +38,13 @@ const LineChartComponent = () => {
   // 利用できる人口カテゴリのリスト
   const labels = ['総人口', '年少人口', '生産年齢人口', '老年人口'];
 
-  // APIキーのヘッダー設定
-  const apiHeaders = {
-    'X-API-KEY': API_KEY ?? '',
-  };
+  // APIキーのヘッダー設定を useMemo でラップ
+  const apiHeaders = useMemo(
+    () => ({
+      'X-API-KEY': API_KEY ?? '',
+    }),
+    []
+  );
 
   // 全国の都道府県データを取得する非同期関数
   const fetchPrefectures = useCallback(async () => {
@@ -55,44 +58,47 @@ const LineChartComponent = () => {
     } catch (error) {
       console.error('Error fetching prefectures: ', error);
     }
-  }, []);
+  }, [apiHeaders]);
 
-  // 指定された都道府県とカテゴリの人口データを取得し、チャート用データに追加する
-  const fetchPopulationData = async (prefCode: number, label: string) => {
-    const url = `https://opendata.resas-portal.go.jp/api/v1/population/composition/perYear?cityCode=-&prefCode=${prefCode}`;
+  // 指定された都道府県とカテゴリの人口データを取得し、チャート用データに追加する関数を useCallback でラップ
+  const fetchPopulationData = useCallback(
+    async (prefCode: number, label: string) => {
+      const url = `https://opendata.resas-portal.go.jp/api/v1/population/composition/perYear?cityCode=-&prefCode=${prefCode}`;
 
-    try {
-      const response = await fetch(url, { headers: apiHeaders });
-      const json = await response.json();
-      // 指定されたカテゴリのデータを取得
-      const selectedData = json.result.data.find(
-        (item: any) => item.label === label
-      );
+      try {
+        const response = await fetch(url, { headers: apiHeaders });
+        const json = await response.json();
+        // 指定されたカテゴリのデータを取得
+        const selectedData = json.result.data.find(
+          (item: any) => item.label === label
+        );
 
-      if (selectedData) {
-        // データをPopulationDataEntry型に整形
-        const populationData = selectedData.data.map((item: any) => ({
-          year: item.year,
-          value: item.value,
-        }));
+        if (selectedData) {
+          // データをPopulationDataEntry型に整形
+          const populationData = selectedData.data.map((item: any) => ({
+            year: item.year,
+            value: item.value,
+          }));
 
-        // 既存のチャートデータに新たに取得したデータをマージ
-        setChartData((prevData) => ({
-          ...prevData,
-          [prefCode]: populationData,
-        }));
+          // 既存のチャートデータに新たに取得したデータをマージ
+          setChartData((prevData) => ({
+            ...prevData,
+            [prefCode]: populationData,
+          }));
+        }
+      } catch (error) {
+        console.error(`Error fetching data for prefCode ${prefCode}: `, error);
       }
-    } catch (error) {
-      console.error(`Error fetching data for prefCode ${prefCode}: `, error);
-    }
-  };
+    },
+    [apiHeaders]
+  );
 
   // 選択された都道府県ごとのデータを更新する
   const updateSelectedPrefectureData = useCallback(() => {
     selectedPrefectures.forEach((prefCode) =>
       fetchPopulationData(prefCode, currentLabel)
     );
-  }, [selectedPrefectures, currentLabel]);
+  }, [selectedPrefectures, currentLabel, fetchPopulationData]);
 
   // 初期表示時に都道府県リストを取得
   useEffect(() => {
