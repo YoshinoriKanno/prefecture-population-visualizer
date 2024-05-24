@@ -34,6 +34,8 @@ const LineChartComponent = () => {
   }>({});
   // 選択された人口カテゴリ（ラベル）を保持
   const [currentLabel, setCurrentLabel] = useState<string>('総人口');
+  // エラーメッセージを保持
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // 利用できる人口カテゴリのリスト
   const labels = ['総人口', '年少人口', '生産年齢人口', '老年人口'];
@@ -53,10 +55,17 @@ const LineChartComponent = () => {
     try {
       const response = await fetch(url, { headers: apiHeaders });
       const json = await response.json();
+
+      if (response.status === 403 || json.statusCode === '403') {
+        throw new Error('403 Forbidden: 無効なAPIキーです。');
+      }
+
       // レスポンスから都道府県データを取得し、ステートに設定
       setPrefectures(json.result || []);
-    } catch (error) {
+      setErrorMessage(null); // エラーメッセージをクリア
+    } catch (error: any) {
       console.error('Error fetching prefectures: ', error);
+      setErrorMessage(error.message || 'データの取得に失敗しました。');
     }
   }, [apiHeaders]);
 
@@ -68,6 +77,11 @@ const LineChartComponent = () => {
       try {
         const response = await fetch(url, { headers: apiHeaders });
         const json = await response.json();
+
+        if (response.status === 403 || json.statusCode === '403') {
+          throw new Error('403 Forbidden: 無効なAPIキーです。');
+        }
+
         // 指定されたカテゴリのデータを取得
         const selectedData = json.result.data.find(
           (item: any) => item.label === label
@@ -86,8 +100,10 @@ const LineChartComponent = () => {
             [prefCode]: populationData,
           }));
         }
-      } catch (error) {
+        setErrorMessage(null); // エラーメッセージをクリア
+      } catch (error: any) {
         console.error(`Error fetching data for prefCode ${prefCode}: `, error);
+        setErrorMessage(error.message || 'データの取得に失敗しました。');
       }
     },
     [apiHeaders]
@@ -143,6 +159,9 @@ const LineChartComponent = () => {
   // UI部分
   return (
     <div className={'p-graph'}>
+      {/* エラーメッセージの表示 */}
+      {errorMessage && <p className="c-error-message">{errorMessage}</p>}
+
       {/* 都道府県のチェックボックスリスト */}
       <ul className={'p-graph__prefecture-lists'}>
         {prefectures.map((prefecture) => (

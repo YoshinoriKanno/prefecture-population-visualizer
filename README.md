@@ -83,6 +83,8 @@ https://yoshinorikanno.github.io/prefecture-population-visualizer/
 
 ## 都道府県のリストが表示されない場合
 
+「403 Forbidden: 無効なAPIキーです。」が表示されます。
+
 都道府県のリストが表示されない場合、指定されたAPIキーが無効であるか、廃止されたバージョンや開発中のバージョンを参照している可能性があります。
 
 もしこの問題が発生した場合は、[Issues](https://github.com/YoshinoriKanno/prefecture-population-visualizer/issues)にてお知らせください。
